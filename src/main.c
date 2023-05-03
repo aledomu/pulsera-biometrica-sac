@@ -23,6 +23,14 @@
 
 #include "hts.h"
 
+#include "heartRate.h"
+#include "MAX30105.h"
+#include "spo2_algorithm.h"
+
+static const struct i2c_dt_spec i2cSpec = I2C_DT_SPEC_GET(DT_NODELABEL(max30105));
+
+static MAX30105 sensor = { .i2cDriver = &i2cSpec };
+
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
 	BT_DATA_BYTES(BT_DATA_UUID16_ALL,
