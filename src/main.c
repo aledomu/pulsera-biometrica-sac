@@ -21,22 +21,15 @@
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/bluetooth/services/bas.h>
 
-#include "hts.h"
-
-#include "heartRate.h"
-#include "MAX30105.h"
-#include "spo2_algorithm.h"
-
-static const struct i2c_dt_spec i2cSpec = I2C_DT_SPEC_GET(DT_NODELABEL(max30105));
-
-static MAX30105 sensor = { .i2cDriver = &i2cSpec };
+#include "hds.h"
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
 	BT_DATA_BYTES(BT_DATA_UUID16_ALL,
 		      BT_UUID_16_ENCODE(BT_UUID_HTS_VAL),
-		      BT_UUID_16_ENCODE(BT_UUID_DIS_VAL),
-		      BT_UUID_16_ENCODE(BT_UUID_BAS_VAL)),
+		      BT_UUID_16_ENCODE(BT_UUID_HRS_VAL),
+		      BT_UUID_16_ENCODE(BT_UUID_BAS_VAL),
+			  BT_UUID_16_ENCODE(BT_UUID_DIS_VAL))
 };
 
 static void connected(struct bt_conn *conn, uint8_t err)
@@ -64,7 +57,7 @@ static void bt_ready(void)
 
 	printk("Bluetooth initialized\n");
 
-	hts_init();
+	hds_init();
 
 	err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, ad, ARRAY_SIZE(ad), NULL, 0);
 	if (err) {
@@ -119,10 +112,8 @@ void main(void)
 	 * of starting delayed work so we do it here
 	 */
 	while (1) {
-		k_sleep(K_SECONDS(1));
-
-		/* Temperature measurements simulation */
-		hts_indicate();
+		/* Health measurements simulation */
+		hds_indicate();
 
 		/* Battery level simulation */
 		bas_notify();
